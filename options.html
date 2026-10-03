@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Select AI · Opciones</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f6f7f9;
+        --card: #ffffff;
+        --text: #1f2328;
+        --muted: #6b7280;
+        --border: rgba(0, 0, 0, 0.12);
+        --accent: #2f6fed;
+        --error: #b42318;
+        --ok: #1a7f37;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #17181c;
+          --card: #22242a;
+          --text: #e6e6e6;
+          --muted: #9aa0a6;
+          --border: rgba(255, 255, 255, 0.14);
+          --accent: #6f9bff;
+          --error: #ff9f94;
+          --ok: #6fd08c;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 32px 20px 48px;
+        background: var(--bg);
+        color: var(--text);
+        font: 400 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      }
+      main {
+        max-width: 560px;
+        margin: 0 auto;
+      }
+      h1 {
+        margin: 0 0 4px;
+        font-size: 20px;
+      }
+      p.sub {
+        margin: 0 0 24px;
+        color: var(--muted);
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+      }
+      .field {
+        margin-bottom: 18px;
+      }
+      label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+      }
+      .hint {
+        margin: 6px 0 0;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      input[type="text"],
+      input[type="password"],
+      input[type="number"],
+      textarea {
+        width: 100%;
+        padding: 9px 11px;
+        color: var(--text);
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font: inherit;
+      }
+      textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
+      input:focus,
+      textarea:focus {
+        outline: 2px solid var(--accent);
+        outline-offset: 1px;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .row input[type="number"] {
+        max-width: 140px;
+      }
+      button {
+        padding: 9px 16px;
+        font: inherit;
+        font-weight: 600;
+        color: #fff;
+        background: var(--accent);
+        border: 0;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      button.secondary {
+        color: var(--text);
+        background: transparent;
+        border: 1px solid var(--border);
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 4px;
+      }
+      .status {
+        margin: 0;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .status[data-tone="ok"] {
+        color: var(--ok);
+      }
+      .status[data-tone="error"] {
+        color: var(--error);
+      }
+      .preview {
+        margin: 10px 0 0;
+        padding: 10px 12px;
+        border: 1px dashed var(--border);
+        border-radius: 8px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Select AI</h1>
+      <p class="sub">Selecciona texto en cualquier página y espera un instante: la extensión responde con Gemini.</p>
+
+      <div class="card">
+        <form id="form" autocomplete="off">
+          <div class="field">
+            <label for="apiKey">API key de Gemini</label>
+            <div class="row">
+              <input id="apiKey" type="password" placeholder="AIza..." spellcheck="false" />
+              <button type="button" class="secondary" id="toggleKey">Ver</button>
+            </div>
+            <p class="hint">Se guarda solo en <code>chrome.storage.local</code> de este navegador. Consíguela en Google AI Studio.</p>
+          </div>
+
+          <div class="field">
+            <label for="model">Modelo</label>
+            <input id="model" type="text" spellcheck="false" placeholder="gemini-3.5-flash-lite" />
+            <p class="hint">Identificador exacto del modelo en la API de Gemini.</p>
+          </div>
+
+          <div class="field">
+            <label for="minChars">Mínimo de caracteres para disparar</label>
+            <input id="minChars" type="number" min="0" max="1500" step="1" />
+            <p class="hint">Por defecto 15. Las selecciones de más de 1500 caracteres se recortan.</p>
+          </div>
+
+          <div class="field">
+            <label for="excludedSites">Sitios excluidos</label>
+            <textarea id="excludedSites" spellcheck="false" placeholder="youtube.com&#10;docs.google.com&#10;*.reddit.com"></textarea>
+            <p class="hint">Un dominio por línea. También se aceptan comodines como <code>*.ejemplo.com</code>.</p>
+          </div>
+
+          <div class="actions">
+            <button type="submit">Guardar</button>
+            <button type="button" class="secondary" id="test">Probar conexión</button>
+            <p class="status" id="status"></p>
+          </div>
+
+          <p class="preview" id="preview" hidden></p>
+        </form>
+      </div>
+    </main>
+    <script src="options.js"></script>
+  </body>
+</html>
